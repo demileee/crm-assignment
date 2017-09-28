@@ -76,11 +76,13 @@ class Contact
   # 1. which of the contact's attributes you want to update
   # 2. the new value for that attribute
   # and then make the appropriate change to the contact
-  def update(id, attribute, change)
-    @@all.each do |contact|
-      if contact.id == id
-        contact.attribute = change
-      end
+  def update(attribute, change)
+    self.attribute = change
+
+    # @@all.each do |contact|
+    #   if contact.id == id
+    #     contact.attribute = change
+    #   end
     end
   end
 
