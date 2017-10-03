@@ -2,10 +2,6 @@ require_relative './contact.rb'
 
 class CRM
 
-  at_exit do
-    ActiveRecord::Base.connection.close
-  end
-
   def main_menu
     while true # repeat indefinitely
       print_main_menu
@@ -24,7 +20,7 @@ class CRM
     puts 'Enter a number: '
   end
 
-  def call_option
+  def call_option(user_selected)
     case user_selected
     when 1 then add_new_contact
     when 2 then modify_existing_contact
@@ -35,25 +31,6 @@ class CRM
     # To be clear, the methods add_new_contact and modify_existing_contact
     # haven't been implemented yet
     end
-  end
-
-  def enter_id
-    puts "Enter your ID number:"
-    id = gets.chomp.to_i
-    @current = Contact.find(id)
-    return @current
-  end
-
-  def which_attribute
-    puts "Enter 1 for first name"
-    puts "Enter 2 for last name"
-    puts "Enter 3 for email"
-    puts "Enter 4 for notes"
-    attribute = gets.chomp.to_i
-      attribute = "first_name" if attribute == 1
-      attribute = "last_name" if attribute == 2
-      attribute = "email" if attribute == 3
-      attribute = "notes" if attribute == 4
   end
 
   def add_new_contact
@@ -69,35 +46,54 @@ class CRM
     print 'Enter a Note: '
     note = gets.chomp
 
-    Contact.create(first_name, last_name, email, note)
+    Contact.create(
+      first_name: first_name,
+      last_name: last_name,
+      email: email,
+      note: note)
   end
 
-  def modify_existing_contact(id)
-    enter_id
-    puts "What would you like to change?"
-    which_attribute
+  def modify_existing_contact
+    puts "Enter the contact ID to update:"
+    id = gets.to_i
+    id = Contact.find(id)
+
+    puts "Which attribute would you like to change?"
+    puts "Enter 'first_name', 'last_name', 'email', or 'note'"
+    att = gets.chomp
+
     puts "What would you like to change it to?"
     change = gets.chomp
-    @contact.update(attribute, change)
+    id.update_attributes(att => change)
   end
 
   def delete_contact
-    enter_id
-    @contact.delete
-    "Contact has been deleted."
+    puts "Enter the contact ID to update:"
+    id = gets.to_i
+    id = Contact.find(id)
+    id.delete
+    puts "Contact has been deleted."
   end
 
   def display_all_contacts
-    return Contact.all
+    puts Contact.all.inspect
   end
 
   def search_by_attribute
     puts "What would you like to search by?"
-    which_attribute
-    puts "What is the value of that attribute?"
-    value = gets.chomp
-    Contact.find_by(attribute, value)
+    att = gets.chomp
+
+    puts "What is the search term?"
+    val = gets.chomp
+
+    puts Contact.find_by(att => val).inspect
   end
 
+end
 
+app = CRM.new
+app.main_menu
+
+at_exit do
+  ActiveRecord::Base.connection.close
 end
