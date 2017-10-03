@@ -2,8 +2,8 @@ require_relative './contact.rb'
 
 class CRM
 
-  def initialize
-
+  at_exit do
+    ActiveRecord::Base.connection.close
   end
 
   def main_menu
